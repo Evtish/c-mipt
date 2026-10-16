@@ -1,17 +1,33 @@
+#include <inttypes.h>
 #include <stdio.h>
 
-// 1. считаем факториал, пока не превзойдём число
-// 2. множитель = число / факториал из предыдущей итерации
-// 3. работаем с разностью аналогично
-void fs(char *res, unsigned int a) { return; }
+#define UINT32_FACT_MAX 12
+
+void fs(uint32_t n) {
+	const size_t s = UINT32_FACT_MAX;
+	size_t i;
+	uint32_t factorials[s];
+	for (i = 1; i < s + 1; i++) {
+		if (i <= 1)
+			factorials[i] = 1;
+		else
+			factorials[i] = i * factorials[i - 1];
+		if (factorials[i] > n)
+			break;
+	}
+	for (size_t j = (i > 1) ? i - 1 : 1; j > 0; j--) {
+		uint32_t m = n / factorials[j];
+		if (m != 0)
+			n %= m * factorials[j];
+		printf("%" PRIu32 ".", m);
+	}
+	fputc('\n', stdout);
+}
 
 int main(void) {
-	unsigned int a;
-	if (scanf("%u", &a) != 1) {
+	uint32_t n;
+	if (scanf("%" PRIu32, &n) != 1)
 		return 1;
-	}
-	char res[32];
-	fs(res, a);
-	printf("%s\n", res);
+	fs(n);
 	return 0;
 }

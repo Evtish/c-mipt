@@ -1,34 +1,22 @@
+#include <math.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
-void read_input(unsigned int *a, unsigned int *b) {
-	if (scanf("%u%u", a, b) != 2)
-		abort();
-}
-
-// unsigned int from_dec2(unsigned int n, unsigned int base) {
-// 	unsigned int n_conv = 0;
-// 	for (unsigned int i = 1; n > 0; i *= 10) {
-// 		n_conv = (n % base) * i + n_conv;
-// 		n /= base;
-// 	}
-// 	return n_conv;
-// }
-
-void from_dec(char *n_conv, unsigned int n, unsigned int base) {
-	for (unsigned int i = 0; n > 0; i++) {
-		memmove(n_conv + 1, n_conv, i);
-		n_conv[0] = '0' + (n % base);
+// Assuming base > 1 and base < 11 and n > 0
+void from_dec(char *n_conv, size_t s, unsigned int n, unsigned int base) {
+	n_conv[s - 1] = '\0';
+	for (size_t i = s - 1; i > 0; i--) {
+		n_conv[i - 1] = '0' + (n % base);
 		n /= base;
 	}
 }
 
 int main(void) {
 	unsigned int n, base;
-	read_input(&n, &base);
-	char n_conv[32] = "";
-	from_dec(n_conv, n, base);
+	if (scanf("%u%u", &n, &base) != 2)
+		return 1;
+	const size_t s = (size_t)(log(n) / log(base)) + 2;
+	char n_conv[s];
+	from_dec(n_conv, s, n, base);
 	printf("%s\n", n_conv);
 	return 0;
 }
