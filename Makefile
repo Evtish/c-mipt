@@ -3,7 +3,7 @@ BUILD_DIR := build
 EXEC_FILE := $(BUILD_DIR)/$(EXEC_NAME)
 
 CC := cc
-CFLAGS := -Wall -Wextra -std=c99 -pedantic -Og -ggdb
+CFLAGS := -Wall -Wextra -Wdeclaration-after-statement -std=c99 -pedantic -Og -ggdb
 LDFLAGS := -lm
 
 all: $(EXEC_FILE)
