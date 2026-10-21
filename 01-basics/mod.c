@@ -12,25 +12,25 @@ int eu_mod(int x, int y) {
 }
 
 int main(void) {
-	printf("%d %% %d = %d\n", 26, 3, 26 % 3);
-	printf("%d %% %d = %d\n", 3, 26, 3 % 26);
-	printf("%d %% %d = %d\n", -26, 3, -26 % 3);
-	printf("%d %% %d = %d\n", 3, -26, 3 % (-26));
-	printf("%d %% %d = %d\n", 26, -3, 26 % (-3));
-	printf("%d %% %d = %d\n", -3, 26, -3 % 26);
-	printf("%d %% %d = %d\n", -26, -3, -26 % (-3));
-	printf("%d %% %d = %d\n", -3, -26, -3 % (-26));
+	printf("%d %% %d = %d\n", 26, 1, 26 % 1);
+	printf("%d %% %d = %d\n", 1, 26, 1 % 26);
+	printf("%d %% %d = %d\n", -26, 1, -26 % 1);
+	printf("%d %% %d = %d\n", 1, -26, 1 % (-26));
+	printf("%d %% %d = %d\n", 26, -1, 26 % (-1));
+	printf("%d %% %d = %d\n", -1, 26, -1 % 26);
+	printf("%d %% %d = %d\n", -26, -1, -26 % (-1));
+	printf("%d %% %d = %d\n", -1, -26, -1 % (-26));
 
 	printf("----------\n");
 
-	printf("%d %% %d = %d\n", 26, 3, eu_mod(26, 3));
-	printf("%d %% %d = %d\n", 3, 26, eu_mod(3, 26));
-	printf("%d %% %d = %d\n", -26, 3, eu_mod(-26, 3));
-	printf("%d %% %d = %d\n", 3, -26, eu_mod(3, (-26)));
-	printf("%d %% %d = %d\n", 26, -3, eu_mod(26, (-3)));
-	printf("%d %% %d = %d\n", -3, 26, eu_mod(-3, 26));
-	printf("%d %% %d = %d\n", -26, -3, eu_mod(-26, (-3)));
-	printf("%d %% %d = %d\n", -3, -26, eu_mod(-3, (-26)));
+	printf("%d %% %d = %d\n", 26, 1, eu_mod(26, 1));
+	printf("%d %% %d = %d\n", 1, 26, eu_mod(1, 26));
+	printf("%d %% %d = %d\n", -26, 1, eu_mod(-26, 1));
+	printf("%d %% %d = %d\n", 1, -26, eu_mod(1, (-26)));
+	printf("%d %% %d = %d\n", 26, -1, eu_mod(26, (-1)));
+	printf("%d %% %d = %d\n", -1, 26, eu_mod(-1, 26));
+	printf("%d %% %d = %d\n", -26, -1, eu_mod(-26, (-1)));
+	printf("%d %% %d = %d\n", -1, -26, eu_mod(-1, (-26)));
 
 	return 0;
 }
