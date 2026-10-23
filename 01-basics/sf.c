@@ -22,7 +22,6 @@ void fib_system(int32_t x) {
 	const double sqrt5 = sqrt(5.0);
 	// https://en.wikipedia.org/wiki/Fibonacci_sequence#Computation_by_rounding
 	size_t n = (size_t)(log(x * sqrt5 + 0.5) / log((1.0 + sqrt5) / 2.0)) - 1;
-	int8_t was_digit_used = 0;
 	int32_t fibs[n];
 	fibs[0] = 1;
 	fibs[1] = 2;
@@ -30,12 +29,11 @@ void fib_system(int32_t x) {
 		fibs[i] = fibs[i - 1] + fibs[i - 2];
 	while (n > 0) {
 		n--;
-		if (!was_digit_used && fibs[n] <= x) {
-			was_digit_used = 1;
+		if (fibs[n] <= x) {
 			x -= fibs[n];
+			fputc('1', stdout);
 		} else
-			was_digit_used = 0;
-		fputc(was_digit_used ? '1' : '0', stdout);
+			fputc('0', stdout);
 	}
 	fputc('\n', stdout);
 }

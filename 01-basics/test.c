@@ -1,9 +1,10 @@
+#include <inttypes.h>
 #include <math.h>
 #include <stdio.h>
 
 int main(void) {
-	int x;
-	if (scanf("%d", &x) != 1 || x < 0) {
+	int32_t x;
+	if (scanf("%" PRIi32, &x) != 1 || x < 0) {
 		fprintf(stderr, "Input one non-negative number\n");
 		return 1;
 	}
