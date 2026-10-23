@@ -10,6 +10,7 @@
 
 #define UINT32_FACT_MAX 12
 
+// TODO: Ensure the length of factorials array is correct
 void fs(uint32_t n) {
 	const size_t s = UINT32_FACT_MAX;
 	size_t i;
