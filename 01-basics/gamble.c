@@ -47,8 +47,7 @@ unsigned int lowest_fib_digit(unsigned int x) {
 }
 
 unsigned int next_turn(unsigned int total, unsigned int possible) {
-#if 1
-	// Use random unstead of just 1 for variety
+	// Add randomness so the pattern isn't too obvious for the other player
 	unsigned int lfd;
 	assert(0 < possible && possible <= total);
 	if (possible == total) // Final turn
@@ -59,16 +58,6 @@ unsigned int next_turn(unsigned int total, unsigned int possible) {
 		return randint(1, possible / 3 - (possible % 3 == 0));
 	}
 	return lfd <= possible ? lfd : (unsigned int)randint(1, possible);
-#else
-	unsigned int lfd;
-	assert(0 < possible && possible <= total);
-	if (possible == total) // Final turn
-		return possible;
-	lfd = lowest_fib_digit(total);
-	if (lfd == total) // If total is a Fibonacci number
-		return 1;
-	return lfd <= possible ? lfd : 1;
-#endif
 }
 
 int main(void) {
@@ -108,15 +97,7 @@ int main(void) {
 		total -= taken;
 		if (total <= 0)
 			break;
-#if 1
 		possible = 2 * taken < total ? 2 * taken : total;
-#else
-		if (2 * taken < total) {
-			possible = 2 * taken;
-		} else {
-			possible = total > 2 ? total - 1 : total;
-		}
-#endif
 		is_user_turn = !is_user_turn;
 	}
 	if (is_user_turn) {
