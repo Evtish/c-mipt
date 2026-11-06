@@ -1,27 +1,14 @@
-#include <inttypes.h>
-#include <stddef.h>
 #include <stdio.h>
 
-#define MF_LEN 4
-
-void matrix_mult_mod_2x2(int32_t res[MF_LEN], int32_t a[MF_LEN],
-						 int32_t b[MF_LEN]) {
-	res[0] = a[0] * b[0] + a[1] * b[2];
-	res[1] = a[0] * b[1] + a[1] * b[3];
-	res[2] = a[2] * b[0] + a[3] * b[2];
-	res[3] = a[2] * b[1] + a[3] * b[3];
-}
-
 int main(void) {
-	int32_t a[MF_LEN] = {5, 3, 45, -564}, b[MF_LEN] = {565, 7, 0, 555},
-			res[MF_LEN];
-	matrix_mult_mod_2x2(res, a, b);
-	for (size_t i = 0; i < MF_LEN; i++) {
-		printf("%" PRId32, res[i]);
-		if (i < MF_LEN - 1)
-			fputc(' ', stdout);
-		else
-			fputc('\n', stdout);
-	}
+	int i = 47000, a = -79, b = 1601;
+	int p0 = i * i + a * i + b;
+	long long p1 = i * i + a * i + b;
+	long long p2 = (long long)i * i + a * i + b;
+	long long p3 = (long long)i * i + (long long)a * i + b;
+	long long p4 = (long long)i * i + (long long)a * i + (long long)b;
+	long long p5 = (long long)i * (long long)i + (long long)a * (long long)i +
+				   (long long)b;
+	printf("%d %lld %lld %lld %lld %lld\n", p0, p1, p2, p3, p4, p5);
 	return 0;
 }

@@ -45,7 +45,7 @@ struct sieve_t {
 // length = n * n.
 static long long get_n(int n) {
 	assert(n > 0);
-	return n * n;
+	return (long long)n * n;
 }
 
 // Initialize sv.
@@ -111,8 +111,7 @@ int count_primes(struct sieve_t *sv, int *pa, int *pb, int n) {
 		 b = find_biggest_prime(sv, b - 1)) {
 		for (a = -1; a > -b; --a) {
 			for (i = 0; i <= n; ++i) {
-				p = i * i + a * i +
-					b; // TODO: Fix integer overflow when n > 2000.
+				p = (long long)i * i + (long long)a * i + (long long)b;
 				assert(p < sv->n);
 				if (p < 0 || sv->s[p])
 					break;
