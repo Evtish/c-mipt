@@ -24,12 +24,13 @@
 // последовательности
 
 #include <assert.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 struct sieve_t {
 	unsigned char *s;
-	int n;
+	long long n;
 };
 
 // Should not be used by the end user.
@@ -42,7 +43,7 @@ struct sieve_t {
 // +1 because we count from 0.
 // length = n * n + (-1) * n + (n - 1) + 1.
 // length = n * n.
-static int get_n(int n) {
+static long long get_n(int n) {
 	assert(n > 0);
 	return n * n;
 }
@@ -58,7 +59,7 @@ int sieve_init(struct sieve_t *sv, int n) {
 
 // Fill sv: 0 if number is prime else 1.
 void sieve_fill(struct sieve_t *sv) {
-	int i, j;
+	long long i, j;
 	sv->s[0] = 1;
 	sv->s[1] = 1;
 	for (i = 2; i * i < sv->n; ++i) {
@@ -72,9 +73,9 @@ void sieve_fill(struct sieve_t *sv) {
 // Should not be used by the end user.
 //
 // Get the biggest prime number less or equal to n.
-static int get_biggest_prime(struct sieve_t *sv, int n) {
+static int find_biggest_prime(struct sieve_t *sv, int n) {
 	int i;
-	assert(n < sv->n);
+	assert(0 <= n && n < sv->n);
 	i = n;
 	while (i > 0) {
 		if (!sv->s[i])
@@ -94,48 +95,51 @@ void sieve_free(struct sieve_t *sv) {
 // Get length of the longest sequence of primes for given a, b, n.
 //
 // Returns the length on success and -1 on failure (when n is too big for sv).
-// If fails pa and pb will stay untouched!
+// If fails pa and pb will stay untouched.
 //
-// b is the biggest prime number < n.
-// -b < a <= -1 (if -a >= b then the result will be 1 on the 2nd iteration).
+// b is a prime number < n.
+// -b < a <= -1 (if a >= -b then the result will be 1 on the 2nd iteration).
 int count_primes(struct sieve_t *sv, int *pa, int *pb, int n) {
-	int i, p, a, b, max_len;
+	int i, a, b, cnt;
+	long long p;
 	if (get_n(n) > sv->n)
 		return -1;
 	*pa = 0;
 	*pb = 0;
-	max_len = 0;
-	for (b = get_biggest_prime(sv, n - 1); b >= 2;
-		 b = get_biggest_prime(sv, b - 1)) {
+	cnt = 0;
+	for (b = find_biggest_prime(sv, n - 1); b >= 2;
+		 b = find_biggest_prime(sv, b - 1)) {
 		for (a = -1; a > -b; --a) {
 			for (i = 0; i <= n; ++i) {
-				p = i * i + a * i + b;
+				p = i * i + a * i +
+					b; // TODO: Fix integer overflow when n > 2000.
 				assert(p < sv->n);
 				if (p < 0 || sv->s[p])
 					break;
 			}
-			if (i > max_len) {
+			if (i > cnt) {
 				*pa = a;
 				*pb = b;
-				max_len = i;
+				cnt = i;
 			}
-			if (max_len >= n)
+			if (cnt >= n)
 				break;
 		}
 	}
-	return max_len;
+	return cnt;
 }
 
 int main(void) {
-	int a, b, n, cnt;
+	int errsv, n, a, b, cnt;
 	struct sieve_t sv;
 	if (scanf("%d", &n) != 1 || n < 1) {
 		fprintf(stderr, "Invalid input. Input one positive integer.\n");
 		return 1;
 	}
 	if (!sieve_init(&sv, n)) {
+		errsv = errno;
 		perror("sieve_init");
-		return 1;
+		return errsv;
 	}
 	sieve_fill(&sv);
 	cnt = count_primes(&sv, &a, &b, n);
