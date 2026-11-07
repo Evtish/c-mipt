@@ -10,25 +10,24 @@
 #include <stdio.h>
 
 int msb(unsigned int n) {
-	unsigned int bits = (sizeof n) * CHAR_BIT, mask = 1u << (bits - 1);
-	int i = bits - 1;
+	int i;
 	if (n == 0)
 		return -1;
-	while (!(n & mask)) {
+	i = (sizeof n) * CHAR_BIT - 1; // amount of bits in n - 1
+	while (!((n >> i) & 1u)) {
 		i--;
-		n <<= 1;
 	}
 	assert(i >= 0);
 	return i;
 }
 
 int lsb(unsigned int n) {
-	int i = 0;
+	int i;
 	if (n == 0)
 		return -1;
-	while (!(n & 1u)) {
+	i = 0;
+	while (!((n >> i) & 1u)) {
 		i++;
-		n >>= 1;
 	}
 	assert(i >= 0);
 	return i;
