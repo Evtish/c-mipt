@@ -1,14 +1,23 @@
+#include <assert.h>
+#include <limits.h>
+#include <math.h>
 #include <stdio.h>
 
+static int get_n(int n) {
+	double log_n;
+	assert(n > 0);
+	if (n == 1)
+		return 3 / CHAR_BIT + 1;
+	log_n = log((double)n);
+	return n * (int)round(log_n + log(log_n)) / CHAR_BIT + 1;
+}
+
 int main(void) {
-	int i = 47000, a = -79, b = 1601;
-	int p0 = i * i + a * i + b;
-	long long p1 = i * i + a * i + b;
-	long long p2 = (long long)i * i + a * i + b;
-	long long p3 = (long long)i * i + (long long)a * i + b;
-	long long p4 = (long long)i * i + (long long)a * i + (long long)b;
-	long long p5 = (long long)i * (long long)i + (long long)a * (long long)i +
-				   (long long)b;
-	printf("%d %lld %lld %lld %lld %lld\n", p0, p1, p2, p3, p4, p5);
+	int n;
+	if (scanf("%d", &n) != 1 || n <= 0) {
+		fprintf(stderr, "Invalid input. Input one positive integer\n");
+		return 1;
+	}
+	printf("%d\n", get_n(n));
 	return 0;
 }
