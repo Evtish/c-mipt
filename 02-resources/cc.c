@@ -65,6 +65,7 @@ int closest_circular_prime(int n) {
 		return 2;
 	else if (is_circular_prime(n))
 		return n;
+	// TODO: Replace this in some cases too short range
 	for (i = 1; n - i >= 2; ++i) {
 		if (i <= INT_MAX - n && is_circular_prime(n + i))
 			return n + i;
