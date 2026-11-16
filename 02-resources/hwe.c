@@ -31,11 +31,15 @@
 #include <assert.h>
 #include <limits.h>
 
-#define SIEVE_B 6  // Should be an even number
-#define SIEVE_R1 1 // Should be a comprime to SIEVE_B
-#define SIEVE_R2 5 // Should be a comprime to SIEVE_B
+// You have to modify is_prime function accordingly if these values do not cover
+// some of the first primes.
+#define SIEVE_B 6  // Should be an even number.
+#define SIEVE_R1 1 // Should be a comprime to SIEVE_B.
+#define SIEVE_R2 5 // Should be a comprime to SIEVE_B.
 
-#ifndef CONTEST
+#ifdef CONTEST
+#include "u_template.h"
+#else
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -52,8 +56,8 @@ static void fill_mod(unsigned char *mod, int len, int b, int r) {
 	int i, j, m, n, upper_bound;
 	assert(b != 0);
 	assert(CHAR_BIT != 0);
-	upper_bound = b * (len * CHAR_BIT - 1) + r;
-	for (i = 0, m = b * i + r; m * m <= upper_bound; ++i, m = b * i + r) {
+	upper_bound = len * CHAR_BIT - 1;
+	for (i = 0, m = b * i + r; i * i <= upper_bound; ++i, m = b * i + r) {
 		assert(i / CHAR_BIT < len);
 		if (mod[i / CHAR_BIT] & (1u << (i % CHAR_BIT)))
 			continue;
@@ -61,10 +65,20 @@ static void fill_mod(unsigned char *mod, int len, int b, int r) {
 			mod[i / CHAR_BIT] |= (1u << (i % CHAR_BIT));
 			continue;
 		}
-		// TODO: Fix the loop
-		for (n = m * m, j = n / b; n <= upper_bound; n += m, j = n / b) {
+#if 0
+		for (n = m * m, j = (n - r) / b; j <= upper_bound;
+			 n += m, j = (n - r) / b) {
+#else
+		// Assuming the first two elements are primes.
+		// I.e. r is a prime and b + r is a prime.
+		if (i < 2)
+			continue;
+		for (j = i * i, n = b * j + r; j <= upper_bound;
+			 j += i, n = b * j + r) {
+#endif
 			assert(j / CHAR_BIT < len);
-			mod[j / CHAR_BIT] |= (1u << (j % CHAR_BIT));
+			if (n % b == r)
+				mod[j / CHAR_BIT] |= (1u << (j % CHAR_BIT));
 		}
 	}
 }
@@ -76,11 +90,14 @@ void fill_sieve(struct sieve_t *sv) {
 
 int is_prime(struct sieve_t *sv, int n) {
 	int q, r;
+	// Because SIEVE_B, SIEVE_R1 and SIEVE_R2 do not cover these primes.
+	if (n == 2 || n == 3)
+		return 1;
 	assert(SIEVE_B != 0);
-	assert(CHAR_BIT != 0);
 	q = n / SIEVE_B, r = n % SIEVE_B;
 	if ((r != SIEVE_R1) && (r != SIEVE_R2))
 		return 0;
+	assert(CHAR_BIT != 0);
 	if (q / CHAR_BIT + 1 > sv->n)
 		return -1;
 	if (r == SIEVE_R1)
