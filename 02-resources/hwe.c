@@ -31,16 +31,13 @@
 #include <assert.h>
 #include <limits.h>
 
-// You have to modify is_prime function accordingly if these values do not cover
-// some of the first primes.
-#define SIEVE_B 6  // Should be an even number.
-#define SIEVE_R1 1 // Should be a comprime to SIEVE_B.
-#define SIEVE_R2 5 // Should be a comprime to SIEVE_B.
+#define SIEVE_B (unsigned int)6
+#define SIEVE_R1 (unsigned int)1
+#define SIEVE_R2 (unsigned int)5
 
 #ifdef CONTEST
 #include "u_template.h"
 #else
-#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -51,76 +48,58 @@ struct sieve_t {
 };
 #endif
 
-// Should not be used by the end user.
-static void fill_mod(unsigned char *mod, int len, int b, int r) {
-	int i, j, m, n, upper_bound;
-	assert(b != 0);
-	assert(CHAR_BIT != 0);
-	upper_bound = len * CHAR_BIT - 1;
-	for (i = 0, m = b * i + r; i * i <= upper_bound; ++i, m = b * i + r) {
-		assert(i / CHAR_BIT < len);
-		if (mod[i / CHAR_BIT] & (1u << (i % CHAR_BIT)))
-			continue;
-		if (m < 2) {
-			mod[i / CHAR_BIT] |= (1u << (i % CHAR_BIT));
-			continue;
-		}
-#if 0
-		for (n = m * m, j = (n - r) / b; j <= upper_bound;
-			 n += m, j = (n - r) / b) {
-#else
-		// Assuming the first two elements are primes.
-		// I.e. r is a prime and b + r is a prime.
-		if (i < 2)
-			continue;
-		for (j = i * i, n = b * j + r; j <= upper_bound;
-			 j += i, n = b * j + r) {
-#endif
-			assert(j / CHAR_BIT < len);
-			if (n % b == r)
-				mod[j / CHAR_BIT] |= (1u << (j % CHAR_BIT));
-		}
-	}
+unsigned int get_upper_bound(int size) {
+	return SIEVE_B * (size * CHAR_BIT - 1) + SIEVE_R2;
 }
 
 void fill_sieve(struct sieve_t *sv) {
-	fill_mod(sv->mod1, sv->n, SIEVE_B, SIEVE_R1);
-	fill_mod(sv->mod5, sv->n, SIEVE_B, SIEVE_R2);
+	unsigned int i, iq, ir, j, jq, jr, upper_bound;
+	upper_bound = get_upper_bound(sv->n);
+	sv->mod1[0] |= 1u; // SIEVE_R1 == 1 is not a prime number
+	for (i = 2; i * i <= upper_bound; ++i) {
+		iq = i / SIEVE_B;
+		ir = i % SIEVE_B;
+		if ((ir == SIEVE_R1) &&
+			(sv->mod1[iq / CHAR_BIT] & (1u << iq % CHAR_BIT)))
+			continue;
+		else if ((ir == SIEVE_R2) &&
+				 (sv->mod5[iq / CHAR_BIT] & (1u << iq % CHAR_BIT)))
+			continue;
+		for (j = i * i; j <= upper_bound; j += i) {
+			jq = j / SIEVE_B;
+			jr = j % SIEVE_B;
+			if (jr == SIEVE_R1)
+				sv->mod1[jq / CHAR_BIT] |= (1u << (jq % CHAR_BIT));
+			else if (jr == SIEVE_R2)
+				sv->mod5[jq / CHAR_BIT] |= (1u << (jq % CHAR_BIT));
+		}
+	}
 }
 
-int is_prime(struct sieve_t *sv, int n) {
-	int q, r;
+int is_prime(struct sieve_t *sv, unsigned int n) {
+	unsigned int q, r;
 	// Because SIEVE_B, SIEVE_R1 and SIEVE_R2 do not cover these primes.
 	if (n == 2 || n == 3)
 		return 1;
-	assert(SIEVE_B != 0);
-	q = n / SIEVE_B, r = n % SIEVE_B;
+	if (n > get_upper_bound(sv->n))
+		return -1;
+	q = n / SIEVE_B;
+	r = n % SIEVE_B;
 	if ((r != SIEVE_R1) && (r != SIEVE_R2))
 		return 0;
-	assert(CHAR_BIT != 0);
-	if (q / CHAR_BIT + 1 > sv->n)
-		return -1;
 	if (r == SIEVE_R1)
 		return !(sv->mod1[q / CHAR_BIT] & (1u << (q % CHAR_BIT)));
-	else
+	else if (r == SIEVE_R2)
 		return !(sv->mod5[q / CHAR_BIT] & (1u << (q % CHAR_BIT)));
+	return -1;
 }
 
 #ifndef CONTEST
-// Should not be used by the end user.
-static int get_n(int amount) {
-	assert(amount > 0);
-	assert(SIEVE_B != 0);
-	assert(CHAR_BIT != 0);
-	return (amount - 1) / SIEVE_B / CHAR_BIT + 1;
-}
+// n - non-negative number to check for primality
+int get_size(unsigned int n) { return n / SIEVE_B / CHAR_BIT + 1; }
 
-int init_sieve(struct sieve_t *sv, int amount) {
-	if (amount < 1) {
-		errno = 1;
-		return -1;
-	}
-	sv->n = get_n(amount);
+int init_sieve(struct sieve_t *sv, int size) {
+	sv->n = size;
 	assert(sv->n > 0);
 	sv->mod1 = calloc(sv->n, sizeof *(sv->mod1));
 	if (!sv->mod1)
@@ -140,20 +119,21 @@ void free_sieve(struct sieve_t *sv) {
 }
 
 int main(void) {
-	int n, is_p;
+	unsigned int n;
+	int is_p;
 	struct sieve_t sv;
-	if (scanf("%d", &n) != 1 || n < 0) {
+	if (scanf("%u", &n) != 1) {
 		fputs("Invalid input. Input one non-negative integer\n", stderr);
 		return EXIT_FAILURE;
 	}
-	if (init_sieve(&sv, n + 1) == -1) {
+	if (init_sieve(&sv, get_size(n)) == -1) {
 		perror("init_sieve");
 		return EXIT_FAILURE;
 	}
 	fill_sieve(&sv);
 	is_p = is_prime(&sv, n);
 	if (is_p == -1) {
-		fprintf(stderr, "n = %d is too big for this sieve\n", n);
+		fprintf(stderr, "is_prime(%u) failed\n", n);
 		free_sieve(&sv);
 		return EXIT_FAILURE;
 	}
