@@ -1,5 +1,4 @@
+**/test.c
 **/build/
-**/*.dat
-
 .vs/
 .vscode/
