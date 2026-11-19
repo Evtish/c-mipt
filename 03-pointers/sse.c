@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void swap(int *const pa, int *const pb) {
+static void swap(int *const pa, int *const pb) {
 	if (*pa == *pb)
 		return;
 	*pa ^= *pb;
@@ -25,7 +25,7 @@ void swap(int *const pa, int *const pb) {
 	*pa ^= *pb;
 }
 
-void selsort_step(int *const arr, size_t len, size_t unsorted_start) {
+static void selsort_step(int *const arr, size_t len, size_t unsorted_start) {
 	size_t min_idx = unsorted_start;
 	assert(unsorted_start < len);
 	for (size_t i = unsorted_start + 1; i < len; ++i) {
@@ -58,7 +58,8 @@ int main(void) {
 	}
 
 	if (scanf("%zu", &unsorted_start) != 1 || unsorted_start >= len) {
-		fputs("Invalid start of unsorted area. Input one positive integer less "
+		fputs("Invalid start of unsorted area. Input one non-negative integer "
+			  "less "
 			  "than the length\n",
 			  stderr);
 		return 1;
